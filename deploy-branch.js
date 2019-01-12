@@ -36,7 +36,7 @@ const ddb = require('./lib/ddb-wrapper')(tableName);
 
   await ddb.addToTable({
     bucket_name: name,
-    delete_after: +moment().add(10, 'minutes').format('x')
+    delete_after: +moment().add(1, 'hour').format('x')
   });
 
   console.log(`use ${getBucketUrl(name)}`);
