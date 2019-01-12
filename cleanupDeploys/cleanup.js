@@ -22,7 +22,3 @@ const doCleanup = async (buckets) => {
 };
 
 module.exports = { doCleanup, getBucketsToDelete };
-
-(async() => {
-  await cleanup();
-})()
