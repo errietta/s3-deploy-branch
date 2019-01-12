@@ -16,7 +16,7 @@ const ddb = require('./lib/ddb-wrapper')(tableName);
 
 (async() => {
   console.log('building..');
-  //await build();
+  await build();
 
   const name = await getBucketName();
 
