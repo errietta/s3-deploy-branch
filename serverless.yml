@@ -34,7 +34,7 @@ provider:
 
 functions:
   cleanup:
-    handler: handler.cleanup
+    handler: cleanupDeploys/handler.cleanup
 
     events:
         - schedule: rate(5 minutes)
@@ -47,18 +47,12 @@ resources:
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: "delete_after"
-            AttributeType: "N"
-          -
             AttributeName: "bucket_name"
             AttributeType: "S"
         KeySchema:
           -
-            AttributeName: "delete_after"
-            KeyType: "HASH"
-          -
             AttributeName: "bucket_name"
-            KeyType: "RANGE"
+            KeyType: "HASH"
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
