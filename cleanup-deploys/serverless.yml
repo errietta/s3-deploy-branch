@@ -1,0 +1,65 @@
+service: cleanup-deploys
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+
+  stage: dev
+  region: eu-west-2
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}
+
+
+# you can add statements to the Lambda function's IAM Role here
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:ListBucket"
+        - "s3:GetBucketLocation"
+        - "s3:ListAllMyBuckets"
+        - "s3:PutObject"
+        - "s3:GetObject"
+        - "s3:DeleteObject"
+      Resource: "arn:aws:s3:::*"
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+
+functions:
+  cleanup:
+    handler: handler.cleanup
+
+    events:
+      - schedule: rate(5 minutes)
+
+resources:
+  Resources:
+    FunctionsDBTable:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: "delete_after"
+            AttributeType: "N"
+          -
+            AttributeName: "bucket_name"
+            AttributeType: "S"
+        KeySchema:
+          -
+            AttributeName: "delete_after"
+            KeyType: "HASH"
+          -
+            AttributeName: "bucket_name"
+            KeyTYpe: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
